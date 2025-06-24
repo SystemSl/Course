@@ -53,7 +53,7 @@ public class BankAccount {
     }
 
     public boolean equals(BankAccount otherAccount) {
-        return (Objects.equals(this.name, otherAccount.name) && this.balance == otherAccount.balance);
+        return (this.name.equals(otherAccount.name) && this.balance == otherAccount.balance);
     }
 
     public int hashCode() {
