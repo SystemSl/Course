@@ -47,16 +47,28 @@ public class BankAccount {
         return this.withdraw(amount) && (otherAccount.deposit(amount) || !this.deposit(amount));
     }
 
+    @Override
     public String toString() {
         return "Name: " + this.name + "\nBalance: " + this.balance + "\nOpening date: " +
                 this.openingData.toLocalDate() + "\nBlocked: " + (this.blocked ? "yes" : "no") + "\nNumber: " + this.number;
     }
 
-    public boolean equals(BankAccount otherAccount) {
-        return (this.name.equals(otherAccount.name) && this.balance == otherAccount.balance);
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        else if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        else {
+            BankAccount otherAccount = (BankAccount) obj;
+            return (this.name.equals(otherAccount.name) && this.balance == otherAccount.balance);
+        }
     }
 
+    @Override
     public int hashCode() {
-        return 31 * this.name.hashCode() + this.balance;
+        return Objects.hash(this.name, this.balance);
     }
 }
