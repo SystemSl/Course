@@ -9,14 +9,15 @@ import java.util.List;
 @Repository
 public class ReviewRepository {
 
+    private Long idCounter = 1L;
+
     private final List<Review> reviews = new ArrayList<>();
 
-    public void save(Review review) {
+    public Review save(Review review) {
+        review.setId(idCounter);
+        idCounter++;
         reviews.add(review);
-    }
-
-    public void remove(Review review) {
-        reviews.remove(review);
+        return review;
     }
 
     public List<Review> findAll() {
@@ -28,5 +29,9 @@ public class ReviewRepository {
                 .filter(r -> r.getId().equals(id))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public void deleteById(Long id) {
+        reviews.removeIf(review -> review.getId().equals(id));
     }
 }
