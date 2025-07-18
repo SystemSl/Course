@@ -43,17 +43,17 @@ public class RestaurantService {
     }
 
     public RestaurantResponseDTO update(Long id, RestaurantRequestDTO dto) {
-        Restaurant existingRestaurant = restaurantRepository.findById(id);
+        Restaurant existingRestaurant = restaurantRepository.findById(id).orElse(null);
         Restaurant updatedRestaurant = restaurantMapper.toEntity(dto);
         updatedRestaurant.setId(existingRestaurant.getId());
         Restaurant savedRestaurant = restaurantRepository.save(updatedRestaurant);
         return restaurantMapper.toResponseDTO(savedRestaurant);
     }
 
-    public void recalculateRatingAfterNewReview(Long restaurantId) {
+    public void recalculateRatingAfterNewReview(Restaurant restaurant) {
         List<Review> reviews = reviewRepository.findAll();
         List<Review> filteredReviews = reviews.stream()
-                .filter(r -> r.getRestaurantId().equals(restaurantId))
+                .filter(r -> r.getRestaurant().equals(restaurant))
                 .toList();
 
         if (!filteredReviews.isEmpty()) {
@@ -61,12 +61,8 @@ public class RestaurantService {
                     .mapToInt(Review::getRating)
                     .sum();
             BigDecimal avgRating = new BigDecimal(sumRatings).divide(BigDecimal.valueOf(filteredReviews.size()), 2, BigDecimal.ROUND_HALF_UP);
-
-            Restaurant restaurant = restaurantRepository.findById(restaurantId);
-
-            if (restaurant != null) {
-                restaurant.setRating(avgRating);
-            }
+            restaurant.setRating(avgRating);
+            restaurantRepository.save(restaurant);
         }
     }
 }

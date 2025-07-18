@@ -1,10 +1,14 @@
 package com.example.course.Services;
 
+import com.example.course.Config.ReviewPK;
 import com.example.course.Dto.Requests.ReviewRequestDTO;
 import com.example.course.Dto.Responses.ReviewResponseDTO;
+import com.example.course.Entities.Restaurant;
 import com.example.course.Entities.Review;
 import com.example.course.Mappers.ReviewMapper;
+import com.example.course.Repositories.RestaurantRepository;
 import com.example.course.Repositories.ReviewRepository;
+import com.example.course.Repositories.VisitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,12 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private VisitorRepository visitorRepository;
+
+    @Autowired
     private ReviewMapper reviewMapper;
 
     @Autowired
@@ -24,9 +34,11 @@ public class ReviewService {
 
     public ReviewResponseDTO save(ReviewRequestDTO dto) {
         Review review = reviewMapper.toEntity(dto);
-        Review savedReview = reviewRepository.save(review);
-        restaurantService.recalculateRatingAfterNewReview(review.getRestaurantId());
-        return reviewMapper.toResponseDTO(savedReview);
+        review.setVisitor(visitorRepository.findById(dto.visitorId()).orElse(null));
+        review.setRestaurant(restaurantRepository.findById(dto.restaurantId()).orElse(null));
+        reviewRepository.save(review);
+        restaurantService.recalculateRatingAfterNewReview(review.getRestaurant());
+        return reviewMapper.toResponseDTO(review);
     }
 
     public List<ReviewResponseDTO> findAll() {
@@ -35,15 +47,18 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public void remove(Long id) {
+    public void remove(ReviewPK id) {
+        Restaurant restaurant = reviewRepository.findById(id).orElse(null).getRestaurant();
         reviewRepository.deleteById(id);
+        restaurantService.recalculateRatingAfterNewReview(restaurant);
     }
 
-    public ReviewResponseDTO update(Long id, ReviewRequestDTO dto) {
-        Review existingReview = reviewRepository.findById(id);
+    public ReviewResponseDTO update(ReviewPK id, ReviewRequestDTO dto) {
+        Review existingReview = reviewRepository.findById(id).orElse(null);
         Review updatedReview = reviewMapper.toEntity(dto);
         updatedReview.setId(existingReview.getId());
         Review savedReview = reviewRepository.save(updatedReview);
+        restaurantService.recalculateRatingAfterNewReview(savedReview.getRestaurant());
         return reviewMapper.toResponseDTO(savedReview);
     }
 }

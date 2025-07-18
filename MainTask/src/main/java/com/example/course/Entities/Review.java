@@ -1,26 +1,32 @@
 package com.example.course.Entities;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import com.example.course.Config.ReviewPK;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "review_table")
 public class Review {
 
-    private Long id;
+    @EmbeddedId
+    private ReviewPK id;
 
-    @NotBlank
-    private Long visitorId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("visitorId")
+    @JoinColumn(name = "visitor_id", nullable = false)
+    private Visitor visitor;
 
-    @NotBlank
-    private Long restaurantId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("restaurantId")
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
-    @Min(1)
-    @Max(5)
+    @Column(name = "rating")
     private int rating;
 
+    @Column(name = "comment")
     private String comment;
 }
