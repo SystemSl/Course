@@ -1,7 +1,6 @@
 package com.example.course.Entities;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,23 +8,28 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "restaurant_table")
 public class Restaurant {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @NotBlank
+    @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
     private String description;
 
-    @NotBlank
+    @Column(name = "kitchen_type")
+    @Enumerated(EnumType.STRING)
     private KitchenType kitchenType;
 
-    @NotBlank
-    @DecimalMin("0.0")
+    @Column(name = "average_bill")
     private BigDecimal averageBill;
 
-    @NotBlank
+    @Column(name = "rating")
     private BigDecimal rating;
 
     public enum KitchenType {

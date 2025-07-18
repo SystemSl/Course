@@ -1,5 +1,6 @@
 package com.example.course.Controllers;
 
+import com.example.course.Config.ReviewPK;
 import com.example.course.Dto.Requests.ReviewRequestDTO;
 import com.example.course.Dto.Responses.ReviewResponseDTO;
 import com.example.course.Services.ReviewService;
@@ -33,14 +34,14 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeReview(@PathVariable Long id) {
+    @DeleteMapping
+    public ResponseEntity<Void> removeReview(@RequestBody ReviewPK id) {
         reviewService.remove(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ReviewResponseDTO> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewRequestDTO dto) {
+    @PutMapping
+    public ResponseEntity<ReviewResponseDTO> updateReview(@RequestBody ReviewPK id, @Valid @RequestBody ReviewRequestDTO dto) {
         ReviewResponseDTO updatedReview = reviewService.update(id, dto);
         return ResponseEntity.ok(updatedReview);
     }

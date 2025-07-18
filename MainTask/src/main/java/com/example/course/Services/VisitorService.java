@@ -36,7 +36,7 @@ public class VisitorService {
     }
 
     public VisitorResponseDTO update(Long id, VisitorRequestDTO dto) {
-        Visitor existingVisitor = visitorRepository.findById(id);
+        Visitor existingVisitor = visitorRepository.findById(id).orElse(null);
         Visitor updatedVisitor = visitorMapper.toEntity(dto);
         updatedVisitor.setId(existingVisitor.getId());
         Visitor savedVisitor = visitorRepository.save(updatedVisitor);

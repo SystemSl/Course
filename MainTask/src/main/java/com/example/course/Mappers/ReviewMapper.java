@@ -12,8 +12,11 @@ public interface ReviewMapper {
 
     ReviewMapper INSTANCE = Mappers.getMapper(ReviewMapper.class);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "dto.visitorId", target = "id.visitorId")
+    @Mapping(source = "dto.restaurantId", target = "id.restaurantId")
     Review toEntity(ReviewRequestDTO dto);
 
+    @Mapping(source = "entity.id.visitorId", target = "visitorId")
+    @Mapping(source = "entity.id.restaurantId", target = "restaurantId")
     ReviewResponseDTO toResponseDTO(Review entity);
 }
