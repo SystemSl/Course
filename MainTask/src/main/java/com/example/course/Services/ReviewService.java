@@ -9,6 +9,8 @@ import com.example.course.Mappers.ReviewMapper;
 import com.example.course.Repositories.RestaurantRepository;
 import com.example.course.Repositories.ReviewRepository;
 import com.example.course.Repositories.VisitorRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,11 +55,23 @@ public class ReviewService {
         restaurantService.recalculateRatingAfterNewReview(restaurant);
     }
 
-    public ReviewResponseDTO update(ReviewPK id, ReviewRequestDTO dto) {
-        Review existingReview = reviewRepository.findById(id).orElse(null);
+    public ReviewResponseDTO update(ReviewRequestDTO dto) {
+        ReviewPK id = new ReviewPK();
+        id.setRestaurantId(dto.restaurantId());
+        id.setVisitorId(dto.visitorId());
+
+        Review existingReview = reviewRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Review not found"));
+
         Review updatedReview = reviewMapper.toEntity(dto);
         updatedReview.setId(existingReview.getId());
+        updatedReview.setVisitor(existingReview.getVisitor());
+        updatedReview.setRestaurant(existingReview.getRestaurant());
+
         Review savedReview = reviewRepository.save(updatedReview);
+        if (savedReview == null) {
+            throw new PersistenceException("Failed to save review");
+        }
+
         restaurantService.recalculateRatingAfterNewReview(savedReview.getRestaurant());
         return reviewMapper.toResponseDTO(savedReview);
     }

@@ -41,8 +41,8 @@ public class ReviewController {
     }
 
     @PutMapping
-    public ResponseEntity<ReviewResponseDTO> updateReview(@RequestBody ReviewPK id, @Valid @RequestBody ReviewRequestDTO dto) {
-        ReviewResponseDTO updatedReview = reviewService.update(id, dto);
+    public ResponseEntity<ReviewResponseDTO> updateReview(@Valid @RequestBody ReviewRequestDTO dto) {
+        ReviewResponseDTO updatedReview = reviewService.update(dto);
         return ResponseEntity.ok(updatedReview);
     }
 }
